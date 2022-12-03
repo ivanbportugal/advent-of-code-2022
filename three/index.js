@@ -6,25 +6,38 @@ const sacks = data.split('\n');
 
 let totalScore = 0;
 
-// let elfCount = 0;
-
+let lineCount = 0;
+const groups = [];
+let group = '';
 for (const sack of sacks) {
-  const one = sack.substring(0, sack.length / 2);
-  const two = sack.substring(sack.length / 2);
+  group = group.concat(`\n${sack}`);
+  lineCount++;
+  if (lineCount > 2) {
+    lineCount = 0;
+    groups.push(group);
+    group = '';
+  }
+}
 
-  // const oneI = 0;
+
+for (const group of groups) {
   let commonChar = undefined;
-  for (const oneChar of [...one]) {
-    
-    for (const twoChar of [...two]) {
-      if (oneChar === twoChar) {
-        // found!
-        commonChar = oneChar;
-        break;
+
+  const elves = group.split('\n').splice(1);
+  const elf1 = elves[0];
+  const elf2 = elves[1];
+  const elf3 = elves[2];
+
+  for (const char1 of [...elf1]) {
+    for (const char2 of [...elf2]) {
+      if (char1 === char2) {
+        for (const char3 of [...elf3]) {
+          if (char1 === char3) {
+            commonChar = char1;
+            break;
+          }
+        }
       }
-    }
-    if (commonChar) {
-      break;
     }
   }
 
@@ -37,7 +50,6 @@ for (const sack of sacks) {
   totalScore += score;
   console.log(`${commonChar}: ${score}. ${totalScore}`)
 }
-
 
 // a - z = 1 - 26
 // A - Z = 27 - 52
