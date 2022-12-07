@@ -56,18 +56,20 @@ for (const command of data) {
   } else {
     // file
     const theFile = command.split(' ');
-    const size = theFile[0];
+    const sizeString = theFile[0];
+    const size = +sizeString;
     const fileName = theFile[1];
-    currentDir.files.push({ fileName, size: +size });
+    currentDir.files.push({ fileName, size });
 
-    currentDir.totalFiles += (+size);
+    currentDir.totalFiles += size;
+    console.log(`SIZE - ${fileName}: ${size} (Total in ${currentDir.name}): ${currentDir.totalFiles}`);
   }
 
   // Not listing a directory, or changing directories
 }
 
 let entireSizeUnder100k = 0;
-// TODO Traverse tree and add them up (recursive)
+// Traverse tree and add them up (recursive)
 const goDeep = (node) => {
   
   let totalSum = node.totalFiles;
@@ -77,7 +79,7 @@ const goDeep = (node) => {
       const childDirSum = goDeep(childDir);
       totalSum += childDirSum;
     }
-    if (totalSum < 300000) {
+    if (totalSum < 100000) {
       // report!
       console.log('******found! ' + node.name + ' - ' + totalSum)
       entireSizeUnder100k += totalSum;
@@ -86,15 +88,17 @@ const goDeep = (node) => {
     }
   }
 
-
   return totalSum;
-  // const filesSum = node.files.reduce((acc, val) => {
-  //   return val.size + acc
-  // }, 0);
-  // const dirSum
-  // node.totalFiles = filesSum
 }
 
 goDeep(root);
+
+function replacer(key,value)
+{
+  if (key=="parent") return undefined;
+  else return value;
+}
+
+console.log(JSON.stringify(root, replacer));
 
 console.log(entireSizeUnder100k);
