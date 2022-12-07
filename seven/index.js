@@ -13,6 +13,10 @@ const root = {
 
 let currentDir = root;
 
+const totalSpaceAvailable = 70000000;
+const targetFreeSpace = 30000000;
+
+let entireSizeUnder100k = 0;
 let isListing = false;
 for (const command of data) {
   if (command === '$ cd /') {
@@ -30,7 +34,12 @@ for (const command of data) {
     isListing = false;
     if(command === '$ cd ..') {
       // go up a directory
+      const currentSum = currentDir.totalFiles;
+      if (currentSum < 100000) {
+        entireSizeUnder100k += currentSum;
+      }
       currentDir = currentDir.parent;
+      currentDir.totalFiles += currentSum
     } else {
       // go down a directory
       const dirName = command.substring(5);
@@ -68,30 +77,30 @@ for (const command of data) {
   // Not listing a directory, or changing directories
 }
 
-let entireSizeUnder100k = 0;
+
 // Traverse tree and add them up (recursive)
-const goDeep = (node) => {
+// const goDeep = (node) => {
   
-  let totalSum = node.totalFiles;
-  if (node.childDirs.length > 0) {
-    for (let i = 0; i < node.childDirs.length; i++) {
-      const childDir = node.childDirs[i];
-      const childDirSum = goDeep(childDir);
-      totalSum += childDirSum;
-    }
-    if (totalSum < 100000) {
-      // report!
-      console.log('******found! ' + node.name + ' - ' + totalSum)
-      entireSizeUnder100k += totalSum;
-    } else {
-      console.log('total! ' + node.name + ' - ' + totalSum)
-    }
-  }
+//   let totalSum = node.totalFiles;
+//   if (node.childDirs.length > 0) {
+//     for (let i = 0; i < node.childDirs.length; i++) {
+//       const childDir = node.childDirs[i];
+//       const childDirSum = goDeep(childDir);
+//       totalSum += childDirSum;
+//     }
+//     if (totalSum < 100000) {
+//       // report!
+//       console.log('******found! ' + node.name + ' - ' + totalSum)
+//       entireSizeUnder100k += totalSum;
+//     } else {
+//       console.log('total! ' + node.name + ' - ' + totalSum)
+//     }
+//   }
 
-  return totalSum;
-}
+//   return totalSum;
+// }
 
-goDeep(root);
+// goDeep(root);
 
 function replacer(key,value)
 {
