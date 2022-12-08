@@ -129,16 +129,20 @@ console.log(entireSizeUnder100k);
 
 
 // const totalSpaceAvailable = 70000000 - 167646984;
-const goalSize = 30000000 - 70000000 - entireSizeUnder100k;
+const goalSize = entireSizeUnder100k - 70000000 - 30000000;
 let minDiff = 1000000000000; // super large
 let minSize = 0;
 
 console.log('**** ' + root.totalFiles);
 // console.log(dirsSizes);
 for (const size of dirsSizes) {
-  const currentDiff = Math.abs(size - goalSize);
+  const currentDiff = goalSize - size;
+  if (currentDiff < 0) {
+    console.log(`IGNORE negative: ${currentDiff} - ${size}. (goal: ${goalSize})`);
+    continue;
+  }
   if (currentDiff < minDiff) {
-    console.log(`lower diff found: ${minDiff} - size: ${size}`);
+    console.log(`lower diff found: ${minDiff} - size: ${size}. (goal: ${goalSize})`);
     minDiff = currentDiff;
     minSize = size;
   }
@@ -160,3 +164,5 @@ console.log(minSize);
 // 	}
 // 	fmt.Println(minNode.size)
 // }
+
+// wrong: 23201776
