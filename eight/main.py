@@ -1,32 +1,72 @@
 
 import re
 
-curr_dir = None
+trees = []
+visible_count = 0
+
 with open("./input.txt") as fp:
-    for line in fp:
-      print(line)
-        # match_cd = re.search(r"\$ cd (.+)", line)
-        # match_file = re.search(r"(\d+)", line)
-        # if match_cd:
-        #     arg = match_cd.group(1)
-        #     curr_dir = Node(arg, parent=curr_dir) if arg != ".." else curr_dir.parent
-        # elif match_file:
-        #     Node(match_file.group(1), parent=curr_dir)
+  for line in fp:
+    characters = list(line)
+    numbers = [int(x) for x in characters]
+    trees.append(numbers)
 
-# for pre, _, node in RenderTree(curr_dir.root):
-#     print(pre + node.name)
+def checkrow(i):
+  tree_row = trees[i]
+  prev_tree = tree_row[0]
+  next_tree = len(tree_row) - 1
 
-# sizes = {}
-# for leaf in curr_dir.root.leaves:
-#     size = int(leaf.name)
-#     for a in leaf.ancestors:
-#         path = "/".join([x.name for x in a.path])
-#         sizes[path] = size if path not in sizes else sizes[path] + size
+  done_with_left_right = False
+  for j in range(len(tree_row) / 2):
+    if j == 0:
+      # Don't count first and last tree
+      visible_count += 1
+      continue
 
-# disk_space_used = 70_000_000 - sizes["/"]
-# disk_space_to_clean = 30_000_000 - disk_space_used
+    if not done_with_left_right and prev_tree <= tree_row[j]:
+      visible_count += 1
+      prev_tree = tree_row[j]
+    else:
+      # All others to the halway are not visible left to right
+      # Check top row
+      done_with_left_right = True
+      def recurse_up(curr_row):
+        if curr_row == 0:
+          return True
+        if trees[curr_row][j] > tree_row[j]:
+          return recurse_up(curr_row - 1)
+        return False
+      pass
 
-# part_one = sum([x for x in sizes.values() if x <= 100_000])
-# part_two = min([x for x in sizes.values() if x >= disk_space_to_clean])
+  done_with_left_right = False
+  for j in range(len(tree_row) - 1, len(tree_row) / 2, -1):
+    if j == len(tree_row - 1):
+      # Don't count first and last tree
+      visible_count += 1
+      continue
 
-# print("\nPart 1:", part_one, "\nPart 2:", part_two)
+    if not done_with_left_right and next_tree <= tree_row[j]:
+      visible_count += 1
+      next_tree = tree_row[j]
+    else:
+      # All others to the halway are not visible left to right
+      done_with_left_right = True
+      break
+
+# middle_trees_row_index = len(trees) / 2
+next_row = len(trees) / 2
+
+for i in range(len(trees) / 2):
+  if i == 0:
+    # Don't count the first and last row
+    visible_count += len(trees)
+    continue
+
+  checkrow()
+
+for i in range(len(trees) - 1, len(trees) / 2, -1):
+  if i == len(trees - 1):
+    # Don't count the first and last row
+    visible_count += len(trees)
+    continue
+
+  checkrow()
