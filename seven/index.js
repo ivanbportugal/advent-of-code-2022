@@ -13,8 +13,11 @@ const root = {
 
 let currentDir = root;
 
-const totalSpaceAvailable = 70000000;
-const targetFreeSpace = 30000000;
+const dirsSizes = [];
+// const smallestDeltaSizePair = {
+//   delta: totalSpaceAvailable,
+//   size: totalSpaceAvailable
+// };
 
 let entireSizeUnder100k = 0;
 let isListing = false;
@@ -35,11 +38,21 @@ for (const command of data) {
     if(command === '$ cd ..') {
       // go up a directory
       const currentSum = currentDir.totalFiles;
-      if (currentSum < 100000) {
+      // if (currentSum < 100000) {
         entireSizeUnder100k += currentSum;
-      }
+      // }
       currentDir = currentDir.parent;
       currentDir.totalFiles += currentSum
+
+      console.log(`Dir Size - ${currentDir.name}: ${currentDir.totalFiles}`);
+      dirsSizes.push(currentDir.totalFiles);
+      // const delta = totalSpaceAvailable - need - currentDir.totalFiles
+      // dirsSizes[delta] = currentDir.totalFiles;
+      // if (delta < smallestDeltaSizePair.delta) {
+      //   smallestDeltaSizePair.delta = delta;
+      //   smallestDeltaSizePair.size = currentDir.totalFiles;
+      // }
+
     } else {
       // go down a directory
       const dirName = command.substring(5);
@@ -71,7 +84,7 @@ for (const command of data) {
     currentDir.files.push({ fileName, size });
 
     currentDir.totalFiles += size;
-    console.log(`SIZE - ${fileName}: ${size} (Total in ${currentDir.name}): ${currentDir.totalFiles}`);
+    // console.log(`SIZE - ${fileName}: ${size} (Total in ${currentDir.name}): ${currentDir.totalFiles}`);
   }
 
   // Not listing a directory, or changing directories
@@ -111,3 +124,39 @@ function replacer(key,value)
 console.log(JSON.stringify(root, replacer));
 
 console.log(entireSizeUnder100k);
+// console.log(smallestDeltaSizePair);
+
+
+
+// const totalSpaceAvailable = 70000000 - 167646984;
+const goalSize = 30000000 - 70000000 - entireSizeUnder100k;
+let minDiff = 1000000000000; // super large
+let minSize = 0;
+
+console.log('**** ' + root.totalFiles);
+// console.log(dirsSizes);
+for (const size of dirsSizes) {
+  const currentDiff = Math.abs(size - goalSize);
+  if (currentDiff < minDiff) {
+    console.log(`lower diff found: ${minDiff} - size: ${size}`);
+    minDiff = currentDiff;
+    minSize = size;
+  }
+}
+
+console.log(minSize);
+
+// func part2() {
+// 	flatNodes := getFlatNodes(rootNode)
+// 	var minNode *Node
+// 	minDiff := float64(10000000000000)
+// 	goalSize := float64(30000000) - (float64(70000000) - float64(rootNode.size))
+// 	for _, n := range flatNodes {
+// 		thisDiff := math.Abs(float64(n.size) - goalSize)
+// 		if thisDiff < minDiff {
+// 			minDiff = thisDiff
+// 			minNode = n
+// 		}
+// 	}
+// 	fmt.Println(minNode.size)
+// }
