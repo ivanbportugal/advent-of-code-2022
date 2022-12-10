@@ -8,7 +8,7 @@
       "program": "${file}",
       "console": "integratedTerminal",
       "justMyCode": true,
-      "cwd": "${workspaceFolder}/nine"
+      "cwd": "${workspaceFolder}/ten"
     },
     {
       "command": "npm start",
